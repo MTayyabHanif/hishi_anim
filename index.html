@@ -55,12 +55,15 @@
             <img id="imgs" src="./frames/nessimzouaoui_001.1.1.png" alt="">
         </div>
 
+        <div style="display: none;" id="allImgs"></div>
+
         <script>
             var frameNumber = 0, // start video at frame 0
                 // lower numbers = faster playback
                 playbackConst = 10,
                 info = document.getElementById("info"),
-            imgs = document.getElementById("imgs")
+            imgs = document.getElementById("imgs"),
+            allImgs = document.getElementById("allImgs"),
             // get page height from video duration
             setHeight = document.getElementById("set-height");
 
@@ -83,6 +86,13 @@
                     frameNumber = 151;
                 }
                 imgs.setAttribute("src", "./frames/nessimzouaoui_001.1." + (Math.round(frameNumber)) + ".png");
+            }
+            
+            for (let index = 1; index < 152; index++) {
+                const currentelement = index;
+                let newImg = document.createElement("img")
+                newImg.setAttribute("src", "./frames/nessimzouaoui_001.1." + index + ".png");
+                allImgs.append(newImg);
             }
 
             // window.requestAnimationFrame(scrollPlay);
