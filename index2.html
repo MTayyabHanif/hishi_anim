@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Animation</title>
+    </head>
+
+    <body>
+        <style>
+            #set-height {
+                display: block;
+                height: 3200px;
+            }
+
+            #info {
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+            #link {
+                position: fixed;
+                top: 0;
+                right: 0;
+            }
+
+            #v0 {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            p font-family helvetica {
+                font-size: 24px;
+            }
+
+            video {
+                position: fixed;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100vh;
+                height: 100vh;
+                object-fit: contain;
+            }
+        </style>
+        <div id="set-height">
+            <p id="info">-</p>
+            <p id="link"><a href="./index.html">Images</a></p>
+            <video id="vid" width="600" muted preload>
+				<source src="https://staging1.hishi.co/wp-content/uploads/2022/03/nessimzouaoui_001-1-2.mp4" type="video/mp4">
+				<source src="https://staging1.hishi.co/wp-content/uploads/2022/03/nessimzouaoui-001-1-2.webm" type="video/webm">
+				<p>Your user agent does not support the HTML5 Video element.</p>
+            </video>
+        </div>
+
+        <script>
+            var frameNumber = 0, // start video at frame 0
+                // lower numbers = faster playback
+                playbackConst = 300,
+                info = document.getElementById("info"),
+            imgs = document.getElementById("imgs"),
+            vid = document.getElementById("vid"),
+            // get page height from video duration
+            setHeight = document.getElementById("set-height");
+
+
+            // Use requestAnimationFrame for smooth playback
+            // function scrollPlay(){  
+            //   var frameNumber  = window.pageYOffset/playbackConst;
+            //   info.innerHTML=frameNumber;
+            //   vid.currentTime  = frameNumber;
+            //   window.requestAnimationFrame(scrollPlay);
+            // }
+
+            window.onscroll = function () {
+                var frameNumber = window.pageYOffset / playbackConst;
+                info.innerHTML = frameNumber;
+                vid.currentTime = frameNumber;
+            }
+
+            // window.requestAnimationFrame(scrollPlay);
+        </script>
+    </body>
+
+</html>
