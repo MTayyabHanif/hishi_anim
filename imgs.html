@@ -82,13 +82,15 @@
 				allImgs.append(newImg);
 			}
 
-			document.body.style.overflowY = "hidden";
+			document.body.style.overflow = "hidden";
+			document.getElementsByTagName('html')[0].style.overflow = "hidden";
 			imgs.style.display = "none";
 			imagesLoaded(document.querySelector('#allImgs'), function (instance) {
 				console.log('all images are loaded');
 				imgs.style.display = "block";
 				link.style.display = "none";
-				document.body.style.overflowY = "inherit";
+				document.body.style.overflow = "inherit";
+				document.getElementsByTagName('html')[0].style.overflow = "inherit";
 			});
 
 			// define the function outside the onscroll function so it doesn't get redefined
