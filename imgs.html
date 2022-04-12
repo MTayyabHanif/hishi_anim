@@ -6,6 +6,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Animation</title>
+		<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+
 	</head>
 
 	<body>
@@ -23,8 +25,11 @@
 
 			#link {
 				position: fixed;
-				top: 0;
-				right: 0;
+				top: 50%;
+				right: 50%;
+				transform: translateY(-50%) translateX(50%);
+				z-index: 120;
+				font-family: sans-serif;
 			}
 
 			#v0 {
@@ -52,7 +57,7 @@
 		</style>
 		<div id="set-height">
 			<p id="info">-</p>
-			<p id="link"><a href="./index2.html">Video</a></p>
+			<p id="link">Loading...</p>
 			<img id="imgs" src="./frames/nessimzouaoui_001.4.1.png" alt="">
 		</div>
 
@@ -62,6 +67,7 @@
 			var frameNumber = 0, // start video at frame 0
 				// lower numbers = faster playback
 				playbackConst = 10,
+				link = document.getElementById("link"),
 				info = document.getElementById("info"),
 				imgs = document.getElementById("imgs"),
 				allImgs = document.getElementById("allImgs"),
@@ -76,6 +82,14 @@
 				allImgs.append(newImg);
 			}
 
+			document.body.style.overflowY = "hidden";
+			imgs.style.display = "none";
+			imagesLoaded(document.querySelector('#allImgs'), function (instance) {
+				console.log('all images are loaded');
+				imgs.style.display = "block";
+				link.style.display = "none";
+				document.body.style.overflowY = "inherit";
+			});
 
 			// define the function outside the onscroll function so it doesn't get redefined
 			function repeatOften() {
