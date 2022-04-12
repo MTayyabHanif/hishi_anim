@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>three.js webgl - OBJLoader + MTLLoader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
+		<style>
+			canvas {
+				display: block;
+			}
+
+			html {
+				overflow: hidden;
+				background: #fff;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+		<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/ScrollTrigger.min.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { MTLLoader } from './MMTLLoader.js';
+			import { OBJLoader } from './OOBJLoader.js';
+			import { STLLoader } from './STLLoader.js';
+			import { GLTFLoader } from './GLTFLoader.js';
+			import { GUI } from './lil-gui.module.min.js';
+			import { OrbitControls } from './OrbitControls.js';
+			import { RGBELoader } from './RGBELoader.js';
+			const backgroundColor = 0xffffff;
+
+
+			/*////////////////////////////////////////*/
+
+			var renderCalls = [];
+
+			function render() {
+				requestAnimationFrame(render);
+				renderCalls.forEach((callback) => {
+					callback();
+				});
+			}
+			render();
+
+			/*////////////////////////////////////////*/
+
+			var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+			camera.position.set( 2.5, 1.5, 3.0 );
+			
+			var scene = new THREE.Scene();
+			
+			var renderer = new THREE.WebGLRenderer({
+				alpha: true,
+				antialias: true
+			});
+
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			window.addEventListener('resize', function () {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}, false);
+
+			document.body.appendChild(renderer.domElement);
+
+			function renderScene() {
+				renderer.render(scene, camera);
+			}
+
+			/* ////////////////////////////////////////////////////////////////////////// */
+
+			var controls = new OrbitControls(camera, renderer.domElement);
+			controls.target.set(0, 0.5, -0.2);
+			// controls.enabled = false;
+
+			
+			renderCalls.push(function () {
+				controls.update()
+			});
+			
+			
+			/* ////////////////////////////////////////////////////////////////////////// */
+			
+			var light = new THREE.PointLight(0xffffcc, 8, 200);
+			light.position.set(4, 30, -20);
+			scene.add(light);
+			
+			var light2 = new THREE.AmbientLight(0x1d5238, 1.5, 20);
+			light2.position.set(40, -10, 30);
+			scene.add(light2);
+			/* ////////////////////////////////////////////////////////////////////////// */
+			
+			const loader = new STLLoader();
+			loader.load( './objects/sample.stl', function ( geometry ) {
+
+				const material = new THREE.MeshPhongMaterial( { color: 0xff5533, specular: 0x111111, shininess: 200 } );
+				const mesh = new THREE.Mesh( geometry, material );
+
+				mesh.position.set( 0, - 0.25, 0.6 );
+				mesh.rotation.set( 0, - Math.PI / 2, 0 );
+				mesh.scale.set( 0.5, 0.5, 0.5 );
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.add( mesh );
+
+			} );
+			
+
+			const outerArea = new GLTFLoader();
+			let outerAreaScene;
+			outerArea.load('./objects/outerbottle.glb', function (data) {
+				var object = data.scene;
+				outerAreaScene = object;
+				object.scale.set(8.0, 8.0, 8.0);
+				
+				object.position.set(0, 0.5, 0);
+				TweenMax.to(object.position, 3, {
+					y: 2.38,
+					repeat: 0,
+					delay: 3,
+					ease: 'Power2.easeInOut'
+				});
+				TweenLite.from( object.rotation, 2, {
+					y: -3,
+					repeat: 0,
+					delay: 6,
+					ease: 'Power2.easeInOut'
+				});
+				TweenMax.to(object.position, 2, {
+					y: 2.43,
+					repeat: 0,
+					delay: 6,
+					ease: 'Power2.easeInOut'
+				});
+				scene.add(object);
+			});
+			
+			const innerArea = new GLTFLoader();
+			let innerAreaScene;
+			innerArea.load('./objects/innerArea.glb', function (data) {
+				var object = data.scene;
+				innerAreaScene = object;
+				object.scale.set(8.0, 8.0, 8.0);
+				object.position.set(0, 0, 0);
+				scene.add(object);
+			});
+			
+			const cap = new GLTFLoader();
+			let capScene;
+			cap.load('./objects/cap.glb', function (data) {
+				var object = data.scene;
+				capScene = object;
+				object.scale.set(8.0, 8.0, 8.0);
+				object.position.set(0, 1, 0);
+				TweenMax.to(object.position, 3, {
+					y: -1.03,
+					repeat: 0,
+					delay: 8,
+					ease: 'Power2.easeInOut'
+				});
+				TweenMax.to(object.position, 1, {
+					y: -1.045,
+					repeat: 0,
+					delay: 11.2,
+					ease: 'Power2.easeInOut'
+				});
+				scene.add(object);
+				});
+				
+				const capInside = new GLTFLoader();
+				let capInsideScene;
+				capInside.load('./objects/capInside.glb', function (data) {
+				var object = data.scene;
+				capInsideScene = object;
+				object.scale.set(8.0, 8.0, 8.0);
+				object.position.set(0, 1, 0);
+				TweenMax.to(object.position, 3, {
+					y: -1.13,
+					repeat: 0,
+					ease: 'Power2.easeInOut'
+				});
+				scene.add(object);
+			});
+			
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderCalls.push(renderScene);
+			
+
+			gsap.timeline({
+			scrollTrigger: {
+				trigger: ".shoe",
+				start: "center center",
+				end: "bottom top",
+				scrub: true,
+				pin: true
+			}
+			})
+			.from(".midsole",  { y: innerHeight * 1.5 })
+			.from(".outsole", { y: innerHeight * 1.5 });
+
+
+
+
+
+			</script>
+
+	</body>
+
+</html>

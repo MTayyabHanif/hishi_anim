@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>three.js webgl - GLTFloader + variants</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_variants" target="_blank" rel="noopener">KHR_materials_variants</a><br />
+			<a href="https://github.com/pushmatrix/glTF-Sample-Models/tree/master/2.0/MaterialsVariantsShoe" target="_blank" rel="noopener">Materials Variants Shoe</a> by
+			<a href="https://github.com/Shopify" target="_blank" rel="noopener">Shopify, Inc</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=quarry_01" target="_blank" rel="noopener">Quarry</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { MTLLoader } from './MMTLLoader.js';
+			import { OBJLoader } from './OOBJLoader.js';
+			import { GLTFLoader } from './GLTFLoader.js';
+			import { GUI } from './lil-gui.module.min.js';
+			import { OrbitControls } from './OrbitControls.js';
+			import { RGBELoader } from './RGBELoader.js';
+
+			let camera, scene, renderer;
+			let gui;
+
+			const state = { variant: 'midnight' };
+
+			init();
+			render();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( 2.5, 1.5, 3.0 );
+
+				scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setPath( './objects/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = 0x000000;
+						// scene.environment = texture;
+
+						render();
+
+						// model 1
+						const innerArea = new GLTFLoader()
+						.setPath( './objects/' );
+						innerArea.load( 'innerArea.glb', function ( gltf ) {
+							gltf.scene.scale.set( 10.0, 10.0, 10.0 );
+							scene.add( gltf.scene );
+							render();
+
+						} );
+						// model 2
+						const outerArea = new GLTFLoader()
+						.setPath( './objects/' );
+						outerArea.load( 'outerArea.glb', function ( gltf ) {
+							gltf.scene.scale.set( 10.0, 10.0, 10.0 );
+							gltf.scene.position.y = 2;
+							scene.add( gltf.scene );
+							setTimeout(function(){
+								console.log('Doing now');
+								TweenMax.from(gltf.scene.position, 3, {
+									y: 3,
+									yoyo: true,
+									repeat: -1,
+									ease: 'Power2.easeInOut'
+								});
+							},2000)
+							
+							render();
+						} );
+
+					} );
+
+				renderer = new THREE.WebGLRenderer( { alpha: true,antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
+
+				
+				var light = new THREE.PointLight( 0xffffcc, 8, 200 );
+				light.position.set( 4, 30, -20 );
+				scene.add( light );
+
+				var light2 = new THREE.AmbientLight( 0x1d5238, 1.5, 20 );
+				light2.position.set( 40, -10, 30 );
+				scene.add( light2 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0.5, - 0.2 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			//
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+
+</html>

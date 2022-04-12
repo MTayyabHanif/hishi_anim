@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Animation</title>
+	</head>
+
+	<body>
+		<style>
+			#set-height {
+				display: block;
+				height: 4300px;
+			}
+
+			#info {
+				position: fixed;
+				top: 0;
+				left: 0;
+			}
+
+			#link {
+				position: fixed;
+				top: 0;
+				right: 0;
+			}
+
+			#v0 {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+
+			p font-family helvetica {
+				font-size: 24px;
+			}
+
+			img {
+				position: fixed;
+				top: 0;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 100vh;
+				height: 100vh;
+				object-fit: contain;
+			}
+		</style>
+		<div id="set-height">
+			<p id="info">-</p>
+			<p id="link"><a href="./index2.html">Video</a></p>
+			<img id="imgs" src="./frames/nessimzouaoui_001.4.1.png" alt="">
+		</div>
+
+		<div style="display: none;" id="allImgs"></div>
+
+		<script>
+			var frameNumber = 0, // start video at frame 0
+				// lower numbers = faster playback
+				playbackConst = 10,
+				info = document.getElementById("info"),
+				imgs = document.getElementById("imgs"),
+				allImgs = document.getElementById("allImgs"),
+				// get page height from video duration
+				setHeight = document.getElementById("set-height");
+
+
+			for (let index = 1; index < 302; index++) {
+				const currentelement = index;
+				let newImg = document.createElement("img")
+				newImg.setAttribute("src", "./frames/nessimzouaoui_001.4." + index + ".png");
+				allImgs.append(newImg);
+			}
+
+
+			// define the function outside the onscroll function so it doesn't get redefined
+			function repeatOften() {
+				var frameNumber = window.pageYOffset / playbackConst;
+				info.innerHTML = frameNumber;
+				if (Math.round(frameNumber) == 0) {
+					frameNumber = 1;
+				}
+				if (Math.round(frameNumber) >= 301) {
+					frameNumber = 301;
+				}
+				imgs.setAttribute("src", "./frames/nessimzouaoui_001.4." + (Math.round(frameNumber)) + ".png");
+			};
+
+			document.addEventListener("scroll", function () {
+				window.requestAnimationFrame(repeatOften);
+			});
+		</script>
+	</body>
+
+</html>

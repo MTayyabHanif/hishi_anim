@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>three.js webgl - OBJLoader + MTLLoader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<canvas></canvas>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+
+
+		<script src="./three.min.js"></script>
+		<script src="./OBJLoader.js"></script>
+		<script src="./MTLLoader.js"></script>
+		<script src="./gsap.min.js"></script>
+		<script>
+			/**
+			 * Base
+			 */
+			// Canvas
+			const canvas = document.querySelector('canvas')
+
+			const onProgress = function (xhr) {
+
+				if (xhr.lengthComputable) {
+
+					const percentComplete = xhr.loaded / xhr.total * 100;
+					console.log(Math.round(percentComplete, 2) + '% downloaded');
+
+				}
+
+			};
+			// Scene
+			const scene = new THREE.Scene()
+
+			/**
+			 * Objects
+			 */
+			const objectsDistance = 4
+
+			// Material
+			const material = new THREE.MeshToonMaterial({
+				color: '#ffeded'
+			})
+
+			// Meshes
+
+			let mesh1 = new THREE.MTLLoader()
+				.setPath('./objects/')
+				.load('capArea.mtl', function (materials) {
+
+					materials.preload();
+
+					new THREE.OBJLoader()
+						.setMaterials(materials)
+						.setPath('./objects/')
+						.load('capArea.obj', function (object) {
+
+							object.position.y = -95;
+							scene.add(object);
+
+						}, onProgress);
+
+				});
+
+			let mesh2 = new THREE.MTLLoader()
+				.setPath('./objects/')
+				.load('innerCapArea.mtl', function (materials) {
+
+					materials.preload();
+
+					new THREE.OBJLoader()
+						.setMaterials(materials)
+						.setPath('./objects/')
+						.load('innerCapArea.obj', function (object) {
+
+							object.position.y = -115;
+							scene.add(object);
+
+						}, onProgress);
+
+				});
+
+			let mesh3 = new THREE.MTLLoader()
+				.setPath('./objects/')
+				.load('bottomArea.mtl', function (materials) {
+
+					materials.preload();
+
+					new THREE.OBJLoader()
+						.setMaterials(materials)
+						.setPath('./objects/')
+						.load('bottomArea.obj', function (object) {
+
+							object.position.y = -125;
+							scene.add(object);
+
+						}, onProgress);
+
+				});
+
+			// let innerArea = new THREE.MTLLoader()
+			// 	.setPath('./objects/')
+			// 	.load('innerArea.mtl', function (materials) {
+
+			// 		materials.preload();
+
+			// 		new THREE.OBJLoader()
+			// 			.setMaterials(materials)
+			// 			.setPath('./objects/')
+			// 			.load('innerArea.obj', function (object) {
+
+			// 				object.position.y = -135;
+			// 				scene.add(object);
+
+			// 			}, onProgress);
+
+			// 	});
+
+
+
+			// const mesh1 = new THREE.Mesh(
+			// 	new THREE.TorusGeometry(1, 0.4, 16, 60),
+			// 	material
+			// )
+			// const mesh2 = new THREE.Mesh(
+			// 	new THREE.ConeGeometry(1, 2, 32),
+			// 	material
+			// )
+			// const mesh3 = new THREE.Mesh(
+			// 	new THREE.TorusKnotGeometry(0.8, 0.35, 100, 16),
+			// 	material
+			// )
+
+			// mesh1.position.y = -objectsDistance * 0
+			// mesh2.position.y = -objectsDistance * 1
+			// mesh3.position.y = -objectsDistance * 2
+
+			// mesh1.position.x = 2
+			// mesh2.position.x = -2
+			// mesh3.position.x = 2
+
+			const sectionMeshes = [mesh1, mesh2, mesh3]
+
+			const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+			scene.add(ambientLight);
+
+			// const pointLight = new THREE.PointLight(0xffffff, 0.8);
+			// camera.add(pointLight);
+			// scene.add(camera);
+
+			/**
+			 * Particles
+			 */
+			// Geometry
+			const particlesCount = 200
+			const positions = new Float32Array(particlesCount * 3)
+
+			for (let i = 0; i < particlesCount; i++) {
+				positions[i * 3 + 0] = (Math.random() - 0.5) * 10
+				positions[i * 3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * sectionMeshes.length
+				positions[i * 3 + 2] = (Math.random() - 0.5) * 10
+			}
+
+			const particlesGeometry = new THREE.BufferGeometry()
+			particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+			// Material
+			const particlesMaterial = new THREE.PointsMaterial({
+				color: '#ffeded',
+				sizeAttenuation: true,
+				size: 0.03
+			})
+
+			// Points
+			const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+			scene.add(particles)
+
+			/**
+			 * Lights
+			 */
+			const directionalLight = new THREE.DirectionalLight('#ffffff', 1)
+			directionalLight.position.set(1, 1, 0)
+			scene.add(directionalLight)
+
+			/**
+			 * Sizes
+			 */
+			const sizes = {
+				width: window.innerWidth,
+				height: window.innerHeight
+			}
+
+			window.addEventListener('resize', () => {
+				// Update sizes
+				sizes.width = window.innerWidth
+				sizes.height = window.innerHeight
+
+				// Update camera
+				camera.aspect = sizes.width / sizes.height
+				camera.updateProjectionMatrix()
+
+				// Update renderer
+				renderer.setSize(sizes.width, sizes.height)
+				renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+			})
+
+			/**
+			 * Scroll
+			 */
+			let scrollY = window.scrollY
+			let currentSection = 0
+
+			window.addEventListener('scroll', () => {
+				scrollY = window.scrollY
+				const newSection = Math.round(scrollY / sizes.height)
+
+				if (newSection != currentSection) {
+					currentSection = newSection
+
+					// gsap.to(
+					// 	sectionMeshes[currentSection].rotation, {
+					// 		duration: 1.5,
+					// 		ease: 'power2.inOut',
+					// 		x: '+=6',
+					// 		y: '+=3'
+					// 	}
+					// )
+				}
+			})
+
+			/**
+			 * Cursor
+			 */
+			const cursor = {}
+			cursor.x = 0
+			cursor.y = 0
+
+			window.addEventListener('mousemove', (event) => {
+				cursor.x = event.clientX / sizes.width - 0.5
+				cursor.y = event.clientY / sizes.height - 0.5
+			})
+
+			/**
+			 * Camera
+			 */
+			// Group
+			const cameraGroup = new THREE.Group()
+			scene.add(cameraGroup)
+
+			// Base camera
+			const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
+			camera.position.z = 6
+			cameraGroup.add(camera)
+
+			/**
+			 * Renderer
+			 */
+			const renderer = new THREE.WebGLRenderer({
+				canvas: canvas,
+				alpha: true
+			})
+			renderer.setSize(sizes.width, sizes.height)
+			renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+			/**
+			 * Animate
+			 */
+			const clock = new THREE.Clock()
+			let previousTime = 0
+
+			const tick = () => {
+				const elapsedTime = clock.getElapsedTime()
+				const deltaTime = elapsedTime - previousTime
+				previousTime = elapsedTime
+
+				// Animate meshes
+				// for (const mesh of sectionMeshes) {
+				// 	.rotation.x += deltaTime * 0.1
+				// 	mesh.rmeshotation.y += deltaTime * 0.12
+				// }
+
+				// Animate camera
+				camera.position.y = -scrollY / sizes.height * objectsDistance
+
+				const parallaxX = cursor.x * 0.5
+				const parallaxY = -cursor.y * 0.5
+
+				cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
+				cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
+
+				// Render
+				renderer.render(scene, camera)
+
+				// Call tick again on the next frame
+				window.requestAnimationFrame(tick)
+			}
+
+			tick()
+		</script>
+
+	</body>
+
+</html>
