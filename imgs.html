@@ -14,7 +14,7 @@
 		<style>
 			#set-height {
 				display: block;
-				height: 4300px;
+				height: 8300px;
 			}
 
 			#info {
@@ -59,7 +59,7 @@
 		<div id="set-height">
 			<p id="info">-</p>
 			<p id="link">Loading...</p>
-			<img id="imgs" src="./frames/nessimzouaoui_001.4.1.png" alt="">
+			<img id="imgs" src="./newFrames/nessimzouaoui_001.5.1.png" alt="">
 		</div>
 
 		<div style="display: none;" id="allImgs"></div>
@@ -76,10 +76,10 @@
 				setHeight = document.getElementById("set-height");
 
 
-			for (let index = 1; index < 302; index++) {
+			for (let index = 1; index < 602; index++) {
 				const currentelement = index;
 				let newImg = document.createElement("img")
-				newImg.setAttribute("src", "./frames/nessimzouaoui_001.4." + index + ".png");
+				newImg.setAttribute("src", "./newFrames/nessimzouaoui_001.5." + index + ".png");
 				allImgs.append(newImg);
 			}
 
@@ -101,10 +101,10 @@
 				if (Math.round(frameNumber) == 0) {
 					frameNumber = 1;
 				}
-				if (Math.round(frameNumber) >= 301) {
-					frameNumber = 301;
+				if (Math.round(frameNumber) >= 601) {
+					frameNumber = 601;
 				}
-				imgs.setAttribute("src", "./frames/nessimzouaoui_001.4." + (Math.round(frameNumber)) + ".png");
+				imgs.setAttribute("src", "./newFrames/nessimzouaoui_001.5." + (Math.round(frameNumber)) + ".png");
 			};
 
 			document.addEventListener("scroll", function () {
